@@ -4,6 +4,8 @@ module datapath ();
     reg [31:0] SrcA, WriteData, SrcB;
     reg        RegWrite;
     reg [31:0] Result;
+    reg [31:0] ImmExt;
+    reg  [1:0] ImmSrc;
 
     adder add4ToPC (.out(PCPlus4), .in1(PC), .in2(32'd4));
 
@@ -20,5 +22,7 @@ module datapath ();
         .WriteRegister(Instr[11:7]),
         .WriteData(Result)
     );
+
+    immediate_extend extend (.ImmExt(ImmExt), .Instr(Instr[31:7]), .ImmSrc(ImmSrc));
 
 endmodule // datapath
