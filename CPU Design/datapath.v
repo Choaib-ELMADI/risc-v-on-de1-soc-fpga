@@ -5,19 +5,22 @@ module datapath ();
     reg [31:0] PCNext, PC, PCPlus4, PCTarget;
     reg [31:0] Instr;
     reg [31:0] SrcA, WriteData, SrcB;
-    reg [31:0] Result;
+    reg [31:0] ALUResult, Result;
     reg [31:0] ImmExt;
+    reg        Zero;
 
     /* ---- CONTROL SIGNALS ---- */
 
     reg  [1:0] ImmSrc;
     reg        RegWrite, ALUSrc, PCSrc;
+    reg  [2:0] ALUControl;
 
     /* ---- MODULES ---- */
 
     program_counter programCounter (.PC(PC), .RESET(RESET), .CLK(CLK), .EN(EN), .PCNext(PCNext));
 
     adder add4ToPC (.out(PCPlus4), .in1(PC), .in2(32'd4));
+    adder PCTarget (.out(PCTarget), .in1(PC), .in2(ImmExt));
 
     instruction_memory memory (.ReadData(Instr), .RESET(RESET), .CLK(CLK), .Address(PC));
 
@@ -38,5 +41,7 @@ module datapath ();
     src_b_mux srcBMux (.SrcB(SrcB), .ALUSrc(ALUSrc), .SrcB1(WriteData), .SrcB2(ImmExt));
 
     pc_next_mux PCNextMux (.PCNext(PCNext), .PCSrc(PCSrc), .PCNext1(PCPlus4), .PCNext2(PCTarget));
+
+    alu ALU (.ALUResult(ALUResult), .Zero(Zero), .ALUControl(ALUControl), .SrcA(SrcA), .SrcB(SrcB));
 
 endmodule // datapath
