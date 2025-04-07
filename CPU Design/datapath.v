@@ -5,14 +5,14 @@ module datapath ();
     reg [31:0] PCNext, PC, PCPlus4, PCTarget;
     reg [31:0] Instr;
     reg [31:0] SrcA, WriteData, SrcB;
-    reg [31:0] ALUResult, Result;
+    reg [31:0] ALUResult, ReadData, Result;
     reg [31:0] ImmExt;
     reg        Zero;
 
     /* ---- CONTROL SIGNALS ---- */
 
     reg  [1:0] ImmSrc;
-    reg        RegWrite, ALUSrc, PCSrc;
+    reg        RegWrite, ALUSrc, PCSrc, MemWrite;
     reg  [2:0] ALUControl;
 
     /* ---- MODULES ---- */
@@ -22,7 +22,7 @@ module datapath ();
     adder add4ToPC (.out(PCPlus4), .in1(PC), .in2(32'd4));
     adder PCTarget (.out(PCTarget), .in1(PC), .in2(ImmExt));
 
-    instruction_memory memory (.ReadData(Instr), .RESET(RESET), .CLK(CLK), .Address(PC));
+    instruction_memory instr_memory (.ReadData(Instr), .RESET(RESET), .CLK(CLK), .Address(PC));
 
     register_file registers (
         .ReadData1(SrcA),
@@ -43,5 +43,14 @@ module datapath ();
     pc_next_mux PCNextMux (.PCNext(PCNext), .PCSrc(PCSrc), .PCNext1(PCPlus4), .PCNext2(PCTarget));
 
     alu ALU (.ALUResult(ALUResult), .Zero(Zero), .ALUControl(ALUControl), .SrcA(SrcA), .SrcB(SrcB));
+
+    data_memory data_memory (
+        .ReadData(ReadData),
+        .RESET(RESET),
+        .CLK(CLK),
+        .WriteEnable(MemWrite),
+        .Address(ALUResult),
+        .WriteData(WriteData)
+    );
 
 endmodule // datapath
