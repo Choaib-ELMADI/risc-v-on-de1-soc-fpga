@@ -1,19 +1,23 @@
-module datapath ();
+module datapath (OP, funct3, funct7, Zero, RESET, CLK, EN, PCSrc, ResultSrc, ALUSrc, ImmSrc, MemWrite, RegWrite, ALUControl);
+    /* ---- PORTS ---- */
+
+    output wire   [6:0] OP;
+    output wire [14:12] funct3;
+    output wire         funct7;
+    output              Zero;
+    input               RESET, CLK, EN;
+    input               PCSrc, ResultSrc, ALUSrc;
+    input         [1:0] ImmSrc;
+    input               MemWrite, RegWrite;
+    input         [2:0] ALUControl;
+
     /* ---- DATA SIGNALS ---- */
 
-    reg        RESET, CLK, EN;
-    reg [31:0] PCNext, PC, PCPlus4, PCTarget;
-    reg [31:0] Instr;
-    reg [31:0] SrcA, WriteData, SrcB;
-    reg [31:0] ALUResult, ReadData, Result;
-    reg [31:0] ImmExt;
-    reg        Zero;
-
-    /* ---- CONTROL SIGNALS ---- */
-
-    reg  [1:0] ImmSrc;
-    reg        RegWrite, ALUSrc, PCSrc, MemWrite, ResultSrc;
-    reg  [2:0] ALUControl;
+    reg          [31:0] PCNext, PC, PCPlus4, PCTarget;
+    reg          [31:0] Instr;
+    reg          [31:0] SrcA, WriteData, SrcB;
+    reg          [31:0] ALUResult, ReadData, Result;
+    reg          [31:0] ImmExt;
 
     /* ---- MODULES ---- */
 
@@ -52,5 +56,11 @@ module datapath ();
         .Address(ALUResult),
         .WriteData(WriteData)
     );
+
+    /* ---- ASSIGNMENTS ---- */
+
+    assign OP     = Instr[6:0];
+    assign funct3 = Instr[14:12];
+    assign funct7 = Instr[30];
 
 endmodule // datapath
