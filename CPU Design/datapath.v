@@ -12,14 +12,14 @@ module datapath ();
     /* ---- CONTROL SIGNALS ---- */
 
     reg  [1:0] ImmSrc;
-    reg        RegWrite, ALUSrc, PCSrc, MemWrite;
+    reg        RegWrite, ALUSrc, PCSrc, MemWrite, ResultSrc;
     reg  [2:0] ALUControl;
 
     /* ---- MODULES ---- */
 
     program_counter programCounter (.PC(PC), .RESET(RESET), .CLK(CLK), .EN(EN), .PCNext(PCNext));
 
-    adder add4ToPC (.out(PCPlus4), .in1(PC), .in2(32'd4));
+    adder add4ToPC (.out(PCPlus4),  .in1(PC), .in2(32'd4));
     adder PCTarget (.out(PCTarget), .in1(PC), .in2(ImmExt));
 
     instruction_memory instr_memory (.ReadData(Instr), .RESET(RESET), .CLK(CLK), .Address(PC));
@@ -38,9 +38,9 @@ module datapath ();
 
     immediate_extend extend (.ImmExt(ImmExt), .Instr(Instr[31:7]), .ImmSrc(ImmSrc));
 
-    src_b_mux srcBMux (.SrcB(SrcB), .ALUSrc(ALUSrc), .SrcB1(WriteData), .SrcB2(ImmExt));
-
-    pc_next_mux PCNextMux (.PCNext(PCNext), .PCSrc(PCSrc), .PCNext1(PCPlus4), .PCNext2(PCTarget));
+    two_to_one_mux srcBMux   (.out(SrcB),   .selectBit(ALUSrc),    .in1(WriteData), .in2(ImmExt));
+    two_to_one_mux PCNextMux (.out(PCNext), .selectBit(PCSrc),     .in1(PCPlus4),   .in2(PCTarget));
+    two_to_one_mux resultMux (.out(Result), .selectBit(ResultSrc), .in1(ALUResult), .in2(ReadData));
 
     alu ALU (.ALUResult(ALUResult), .Zero(Zero), .ALUControl(ALUControl), .SrcA(SrcA), .SrcB(SrcB));
 
