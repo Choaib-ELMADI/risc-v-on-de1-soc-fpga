@@ -19,6 +19,11 @@ module datapath (OP, funct3, funct7, Zero, RESET, CLK, EN, PCSrc, ResultSrc, ALU
     reg          [31:0] ALUResult, ReadData, Result;
     reg          [31:0] ImmExt;
 
+    /* ---- PARAMETERS ---- */
+
+    parameter           INSTRUCTION_MEMORY_SIZE = 64;
+    parameter           DATA_MEMORY_SIZE        = 128;
+
     /* ---- MODULES ---- */
 
     program_counter programCounter (.PC(PC), .RESET(RESET), .CLK(CLK), .EN(EN), .PCNext(PCNext));
@@ -26,7 +31,13 @@ module datapath (OP, funct3, funct7, Zero, RESET, CLK, EN, PCSrc, ResultSrc, ALU
     adder add4ToPC (.out(PCPlus4),  .in1(PC), .in2(32'd4));
     adder PCTarget (.out(PCTarget), .in1(PC), .in2(ImmExt));
 
-    instruction_memory instr_memory (.ReadData(Instr), .RESET(RESET), .CLK(CLK), .Address(PC));
+    instruction_memory #(.MEMORY_SIZE(INSTRUCTION_MEMORY_SIZE)) instr_memory
+        (
+            .ReadData(Instr),
+            .RESET(RESET),
+            .CLK(CLK),
+            .Address(PC)
+        );
 
     register_file registers (
         .ReadData1(SrcA),
@@ -48,14 +59,15 @@ module datapath (OP, funct3, funct7, Zero, RESET, CLK, EN, PCSrc, ResultSrc, ALU
 
     alu ALU (.ALUResult(ALUResult), .Zero(Zero), .ALUControl(ALUControl), .SrcA(SrcA), .SrcB(SrcB));
 
-    data_memory data_memory (
-        .ReadData(ReadData),
-        .RESET(RESET),
-        .CLK(CLK),
-        .WriteEnable(MemWrite),
-        .Address(ALUResult),
-        .WriteData(WriteData)
-    );
+    data_memory #(.MEMORY_SIZE(DATA_MEMORY_SIZE)) data_memory
+        (
+            .ReadData(ReadData),
+            .RESET(RESET),
+            .CLK(CLK),
+            .WriteEnable(MemWrite),
+            .Address(ALUResult),
+            .WriteData(WriteData)
+        );
 
     /* ---- ASSIGNMENTS ---- */
 
