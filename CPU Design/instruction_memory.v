@@ -4,18 +4,18 @@ module instruction_memory (ReadData, RESET, CLK, Address);
     input      [31:0] Address;
 
     // 64 rows memory * 32 bits each
-    reg        [31:0] MEMORY[63:0];
+    reg        [31:0] INSTRUCTION_MEMORY[63:0];
     integer           i;
 
     always @(posedge RESET, posedge CLK)
         begin
             if (RESET) begin
                 for (i=0; i<=63; i=i+1) begin
-                    MEMORY[i] <= 32'b00;
+                    INSTRUCTION_MEMORY[i] <= 32'b00;
                 end
             end
             else
-                ReadData <= MEMORY[Address];
+                ReadData <= INSTRUCTION_MEMORY[Address];
         end
 
 endmodule // instruction_memory
