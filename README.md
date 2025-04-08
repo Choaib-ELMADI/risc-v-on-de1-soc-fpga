@@ -1,10 +1,14 @@
-[![Choaib ELMADI - RISC-V](https://img.shields.io/badge/Choaib_ELMADI-RISC--V-8800dd)](https://elmadichoaib.vercel.app) ![Status - Building](https://img.shields.io/badge/Status-Building-2bd729) ![Platform - DE1-SoC](https://img.shields.io/badge/Platform-DE1--SoC-f7d620)
+[![Choaib ELMADI - RISC-V](https://img.shields.io/badge/Choaib_ELMADI-RISC--V-8800dd)](https://elmadichoaib.vercel.app) ![Status - Building](https://img.shields.io/badge/Status-Building-2bd729) ![Platform - DE1-SoC](https://img.shields.io/badge/Platform-DE--1_SoC-f7d620)
 
-# RISC-V Processor on DE1-SoC FPGA
+# RISC-V Processor on DE-1 SoC FPGA
 
-Welcome to the `risc-v-on-de1-soc-fpga` repository! This project implements a simplified RISC-V processor architecture using Verilog and is deployed on the DE1-SoC FPGA development board.
+Welcome to the `risc-v-on-de1-soc-fpga` repository! This project implements a simplified RISC-V processor architecture using Verilog and is deployed on the DE-1 SoC FPGA development board.
 
-### Single Cycle Processor:
+## Repository Structure
+
+The repository is structured as follows:
+
+- **Single Cycle Processor**: Contains the implementation of the single-cycle RISC-V CPU and its modules.
 
 <div align="center">
 
@@ -12,7 +16,7 @@ Welcome to the `risc-v-on-de1-soc-fpga` repository! This project implements a si
 
 </div>
 
-### Multi Cycle Processor:
+- **Multi Cycle Processor**: Contains the implementation of the multi-cycle RISC-V CPU and its modules.
 
 <div align="center">
 
@@ -20,31 +24,13 @@ Welcome to the `risc-v-on-de1-soc-fpga` repository! This project implements a si
 
 </div>
 
-### Pipelined Processor:
+- **Pipelined Processor**: _Coming soon..._
 
 <div align="center">
 
 ![Pipelined Processor](./Images/3-%20pipelined-processor.png)
 
 </div>
-
-## Repository Structure
-
-The repository is structured as follows:
-
-- **CPU Design**: This folder contains the core Verilog modules of the RISC-V processor:
-
-  - `adder.v`
-  - `alu.v`
-  - `control_unit.v`
-  - `cpu.v`
-  - `data_memory.v`
-  - `datapath.v`
-  - `immediate_extend.v`
-  - `instruction_memory.v`
-  - `program_counter.v`
-  - `register_file.v`
-  - `two_to_one_mux.v`
 
 - **Images**: Visuals, diagrams, and waveform screenshots related to the design and simulation.
 
@@ -62,7 +48,7 @@ The `cpu.v` module is the top-level design and contains the instantiations of `d
 
 - **Quartus Prime** – For writing, compiling, and deploying Verilog code.
 - **ModelSim** – For simulation and debugging.
-- **DE1-SoC FPGA Board** – As the hardware target platform.
+- **DE-1 SoC FPGA Board** – As the hardware target platform.
 
 ## Goal of the Project
 
