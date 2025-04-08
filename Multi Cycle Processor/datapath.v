@@ -1,4 +1,4 @@
-module datapath (OP, funct3, funct7, Zero, RESET, CLK, EN, PCSrc, ResultSrc, ALUSrc, ImmSrc, MemWrite, RegWrite, ALUControl);
+module datapath (OP, funct3, funct7, Zero, RESET, CLK, ALUSrcA, ALUSrcB, ImmSrc, ResultSrc, ALUControl, AdrSrc, PCWrite, MemWrite, RegWrite, IRWrite);
     /* ---- PORTS ---- */
 
     output wire   [6:0] OP;
@@ -6,11 +6,10 @@ module datapath (OP, funct3, funct7, Zero, RESET, CLK, EN, PCSrc, ResultSrc, ALU
     output wire         funct7;
     output              Zero;
     input               RESET, CLK;
-    input               AdrSrc;
-    input         [1:0] ALUSrcA, ALUSrcB, ResultSrc;
-    input         [1:0] ImmSrc;
-    input               PCWrite, RegWrite;
+    input         [1:0] ALUSrcA, ALUSrcB, ImmSrc, ResultSrc;
     input         [2:0] ALUControl;
+    input               AdrSrc;
+    input               PCWrite, MemWrite, RegWrite, IRWrite;
 
     /* ---- DATA SIGNALS ---- */
 
@@ -18,9 +17,9 @@ module datapath (OP, funct3, funct7, Zero, RESET, CLK, EN, PCSrc, ResultSrc, ALU
     reg          [31:0] Address, Instr;
     reg          [31:0] SrcA, SrcB, A;
     reg          [31:0] RD1, RD2, WriteData;
-    reg          [31:0] ALUResult, ReadData, Result, ALUOut;
+    reg          [31:0] ALUResult, Result, ALUOut;
     reg          [31:0] ImmExt;
-    reg          [31:0] Data;
+    reg          [31:0] ReadData, Data;
 
     /* ---- PARAMETERS ---- */
 
@@ -42,9 +41,9 @@ module datapath (OP, funct3, funct7, Zero, RESET, CLK, EN, PCSrc, ResultSrc, ALU
             .WriteData(WriteData)
         );
 
-    // TODO:
-
-    d_flip_flop dataFlipFlop (.out(Data), .CLK(CLK), .in(ReadData));
+    d_flip_flop             oldPCFlipFlop (.out(OldPC), .CLK(CLK),               .in(PC));
+    d_flip_flop_with_enable instrFlipFlop (.out(Instr), .CLK(CLK), .EN(IRWrite), .in(ReadData));
+    d_flip_flop             dataFlipFlop  (.out(Data),  .CLK(CLK),               .in(ReadData));
 
     register_file registers (
         .ReadData1(RD1),
@@ -58,7 +57,8 @@ module datapath (OP, funct3, funct7, Zero, RESET, CLK, EN, PCSrc, ResultSrc, ALU
         .WriteData(Result)
     );
 
-    // TODO:
+    d_flip_flop AFlipFlop         (.out(A),         .CLK(CLK), .in(RD1));
+    d_flip_flop writeDataFlipFlop (.out(WriteData), .CLK(CLK), .in(RD2));
 
     immediate_extend extend (.ImmExt(ImmExt), .Instr(Instr[31:7]), .ImmSrc(ImmSrc));
 
