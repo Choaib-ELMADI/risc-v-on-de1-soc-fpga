@@ -4,6 +4,30 @@
 
 Welcome to the `risc-v-on-de1-soc-fpga` repository! This project implements a simplified RISC-V processor architecture using Verilog and is deployed on the DE1-SoC FPGA development board.
 
+### Single Cycle Processor:
+
+<div align="center">
+
+![Single Cycle Processor](./Images/1-%20single-cycle-processor.png)
+
+</div>
+
+### Multi Cycle Processor:
+
+<div align="center">
+
+![Multi Cycle Processor](./Images/2-%20multi-cycle-processor.png)
+
+</div>
+
+### Pipelined Processor:
+
+<div align="center">
+
+![Pipelined Processor](./Images/3-%20pipelined-processor.png)
+
+</div>
+
 ## Repository Structure
 
 The repository is structured as follows:
