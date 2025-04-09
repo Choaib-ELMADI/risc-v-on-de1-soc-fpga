@@ -41,7 +41,7 @@ module datapath (OP, funct3, funct7, Zero, RESET, CLK, ALUSrcA, ALUSrcB, ImmSrc,
             .WriteData(WriteData)
         );
 
-    d_flip_flop             oldPCFlipFlop (.out(OldPC), .CLK(CLK),               .in(PC));
+    d_flip_flop             oldPCFlipFlop (.out(OldPC), .CLK(CLK), .EN(IRWrite), .in(PC));
     d_flip_flop_with_enable instrFlipFlop (.out(Instr), .CLK(CLK), .EN(IRWrite), .in(ReadData));
     d_flip_flop             dataFlipFlop  (.out(Data),  .CLK(CLK),               .in(ReadData));
 
