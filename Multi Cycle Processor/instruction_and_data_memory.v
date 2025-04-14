@@ -1,10 +1,11 @@
 module instruction_and_data_memory
     #(parameter MEMORY_SIZE = 64)
-    (ReadData, RESET, CLK, WriteEnable, Address, WriteData);
+    (ReadData, RESET, CLK, WriteEnable, Address, WriteData,size);
 
     output reg [31:0] ReadData;
     input             RESET, CLK, WriteEnable;
     input      [31:0] Address, WriteData;
+    input      [2:0]  size;
 
     // 64 rows memory * 32 bits each
     reg        [31:0] MEMORY[MEMORY_SIZE-1:0];
