@@ -1,4 +1,4 @@
-module datapath (OP, funct3, funct7, Zero, cout, overflow ,sign, RESET, CLK, ALUSrcA, ALUSrcB, ImmSrc, ResultSrc, ALUControl, AdrSrc, PCWrite, MemWrite, RegWrite, IRWrite);
+module datapath (OP, funct3, funct7, Zero, cout, overflow ,sign, RESET, CLK, ALUSrcA, ALUSrcB, ImmSrc, ResultSrc, ALUControl, AdrSrc, PCWrite, MemWrite, RegWrite, IRWrite,size);
     /* ---- PORTS ---- */
 
     output wire   [6:0] OP;
@@ -10,6 +10,7 @@ module datapath (OP, funct3, funct7, Zero, cout, overflow ,sign, RESET, CLK, ALU
     input         [2:0] ALUControl;
     input               AdrSrc;
     input               PCWrite, MemWrite, RegWrite, IRWrite;
+    input         [2:0] size;
 
     /* ---- DATA SIGNALS ---- */
 
@@ -38,7 +39,8 @@ module datapath (OP, funct3, funct7, Zero, cout, overflow ,sign, RESET, CLK, ALU
             .CLK(CLK),
             .WriteEnable(MemWrite),
             .Address(Address),
-            .WriteData(WriteData)
+            .WriteData(WriteData),
+            .size(size)
         );
 
     d_flip_flop             oldPCFlipFlop (.out(OldPC), .CLK(CLK), .EN(IRWrite), .in(PC));
