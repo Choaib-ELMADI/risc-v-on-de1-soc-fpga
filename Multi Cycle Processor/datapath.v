@@ -1,4 +1,4 @@
-module datapath (OP, funct3, funct7, Zero, RESET, CLK, ALUSrcA, ALUSrcB, ImmSrc, ResultSrc, ALUControl, AdrSrc, PCWrite, MemWrite, RegWrite, IRWrite);
+module datapath (OP, funct3, funct7, Zero, cout, overflow ,sign, RESET, CLK, ALUSrcA, ALUSrcB, ImmSrc, ResultSrc, ALUControl, AdrSrc, PCWrite, MemWrite, RegWrite, IRWrite);
     /* ---- PORTS ---- */
 
     output wire   [6:0] OP;
