@@ -1,15 +1,16 @@
-module datapath (OP, funct3, funct7, Zero, RESET, CLK, ALUSrcA, ALUSrcB, ImmSrc, ResultSrc, ALUControl, AdrSrc, PCWrite, MemWrite, RegWrite, IRWrite);
+module datapath (OP, funct3, funct7, Zero, cout, overflow ,sign, RESET, CLK, ALUSrcA, ALUSrcB, ImmSrc, ResultSrc, ALUControl, AdrSrc, PCWrite, MemWrite, RegWrite, IRWrite,size);
     /* ---- PORTS ---- */
 
     output wire   [6:0] OP;
     output wire [14:12] funct3;
     output wire         funct7;
-    output              Zero;
+    output              Zero,cout,overflow,sign;
     input               RESET, CLK;
     input         [1:0] ALUSrcA, ALUSrcB, ImmSrc, ResultSrc;
     input         [2:0] ALUControl;
     input               AdrSrc;
     input               PCWrite, MemWrite, RegWrite, IRWrite;
+    input         [2:0] size;
 
     /* ---- DATA SIGNALS ---- */
 
@@ -38,7 +39,8 @@ module datapath (OP, funct3, funct7, Zero, RESET, CLK, ALUSrcA, ALUSrcB, ImmSrc,
             .CLK(CLK),
             .WriteEnable(MemWrite),
             .Address(Address),
-            .WriteData(WriteData)
+            .WriteData(WriteData),
+            .size(size)
         );
 
     d_flip_flop             oldPCFlipFlop (.out(OldPC), .CLK(CLK), .EN(IRWrite), .in(PC));
@@ -66,7 +68,7 @@ module datapath (OP, funct3, funct7, Zero, RESET, CLK, ALUSrcA, ALUSrcB, ImmSrc,
     three_to_one_mux srcBMux   (.out(SrcB),   .selectBits(ALUSrcB),   .in1(WriteData), .in2(ImmExt), .in3(32'd4));
     three_to_one_mux resultMux (.out(Result), .selectBits(ResultSrc), .in1(ALUOut),    .in2(Data),   .in3(ALUResult));
 
-    alu ALU (.ALUResult(ALUResult), .Zero(Zero), .ALUControl(ALUControl), .SrcA(SrcA), .SrcB(SrcB));
+    alu ALU (.SrcA(SrcA), .SrcB(SrcB) , .aluc(ALUControl), .Alu_out(ALUResult), .zero(Zero), .cout(cout), .overflow(overflow), .sign(sign));
 
     d_flip_flop ALUFlipFlop (.out(ALUOut), .CLK(CLK), .in(ALUResult));
 
