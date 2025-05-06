@@ -7,6 +7,9 @@ module datapath (OP, funct3, funct7, ZeroE, CLK, RESET, ImmSrcD, PCSrcE, ALUSrcE
 
     /* ---- INPUT PORTS ---- */
     input               CLK, RESET;
+    input               StallF, StallD;
+    input               FlushD, FlushE;
+    input         [1:0] ForwardAE, ForwardBE;
     input         [1:0] ImmSrcD;
     input               PCSrcE, ALUSrcE;
     input         [2:0] ALUControlE;
@@ -22,11 +25,13 @@ module datapath (OP, funct3, funct7, ZeroE, CLK, RESET, ImmSrcD, PCSrcE, ALUSrcE
     reg          [31:0] RD1D, RD2D;
     reg          [31:0] RD1E, RD2E;
     reg          [11:7] RdD, RdE, RdM, RdW;
+    reg         [19:15] Rs1D, Rs1E;
+    reg         [24:20] Rs2D, Rs2E;
     reg          [31:0] ResultW;
     reg          [31:0] ALUResultE, ALUResultM, ALUResultW;
     reg          [31:0] ImmExtD, ImmExtE;
-    reg          [31:0] SrcBE;
-    reg          [31:0] WriteDataM;
+    reg          [31:0] SrcAE, SrcBE;
+    reg          [31:0] WriteDataE, WriteDataM;
     reg          [31:0] ReadDataM, ReadDataW;
 
     /* ---- PARAMETERS ---- */
@@ -39,7 +44,7 @@ module datapath (OP, funct3, funct7, ZeroE, CLK, RESET, ImmSrcD, PCSrcE, ALUSrcE
 
     two_to_one_mux PCFPrimeMux (.out(PCFPrime), .selectBit(PCSrcE), .in1(PCPlus4F), .in2(PCTargetE));
 
-    d_flip_flop PCFFlipFlop (.out(PCF), .CLK(CLK), .in(PCFPrime));
+    d_flip_flop_with_enable PCFFlipFlop (.out(PCF), .CLK(CLK), .EN(~StallF), .in(PCFPrime));
 
     instruction_memory #(.MEMORY_SIZE(INSTR_MEMORY_SIZE)) instructionMemory
         (
@@ -53,9 +58,9 @@ module datapath (OP, funct3, funct7, ZeroE, CLK, RESET, ImmSrcD, PCSrcE, ALUSrcE
 
     /* ---- END FETCH STAGE ---- */
 
-    d_flip_flop instrDFlipFlop   (.out(InstrD),   .CLK(CLK), .in(InstrF));
-    d_flip_flop PCDFlipFlop      (.out(PCD),      .CLK(CLK), .in(PCF));
-    d_flip_flop PCPlus4DFlipFlop (.out(PCPlus4D), .CLK(CLK), .in(PCPlus4F));
+    d_flip_flop_with_enable instrDFlipFlop   (.out(InstrD),   .CLK(CLK), .CLR(FlushD), .EN(~StallD), .in(InstrF));
+    d_flip_flop_with_enable PCDFlipFlop      (.out(PCD),      .CLK(CLK), .CLR(FlushD), .EN(~StallD), .in(PCF));
+    d_flip_flop_with_enable PCPlus4DFlipFlop (.out(PCPlus4D), .CLK(CLK), .CLR(FlushD), .EN(~StallD), .in(PCPlus4F));
 
     /* ---- START DECODE STAGE ---- */
 
@@ -63,7 +68,7 @@ module datapath (OP, funct3, funct7, ZeroE, CLK, RESET, ImmSrcD, PCSrcE, ALUSrcE
         .ReadData1(RD1D),
         .ReadData2(RD2D),
         .RESET(RESET),
-        .CLK(CLK),
+        .CLK(~CLK),
         .ReadRegister1(InstrD[19:15]),
         .ReadRegister2(InstrD[24:20]),
         .WriteEnable(RegWriteW),
@@ -73,29 +78,40 @@ module datapath (OP, funct3, funct7, ZeroE, CLK, RESET, ImmSrcD, PCSrcE, ALUSrcE
 
     immediate_extend extend (.ImmExt(ImmExtD), .Instr(InstrD[31:7]), .ImmSrc(ImmSrcD));
 
+    /* ---- MAY GENERATE AN ERROR! ---- */
+    assign RdD  = InstrD[11:7];
+    assign Rs1D = InstrD[19:15];
+    assign Rs2D = InstrD[24:20];
+
     /* ---- END DECODE STAGE ---- */
 
-    d_flip_flop RD1EFlipFlop     (.out(RD1E),     .CLK(CLK), .in(RD1D));
-    d_flip_flop RD2ElipFlop      (.out(RD2E),     .CLK(CLK), .in(RD2D));
-    d_flip_flop PCEFlipFlop      (.out(PCE),      .CLK(CLK), .in(PCD));
-    d_flip_flop RdEFlipFlop      (.out(RdE),      .CLK(CLK), .in(RdD));
-    d_flip_flop ImmExtEFlipFlop  (.out(ImmExtE),  .CLK(CLK), .in(ImmExtD));
-    d_flip_flop PCPlus4EFlipFlop (.out(PCPlus4E), .CLK(CLK), .in(PCPlus4D));
+    d_flip_flop RD1EFlipFlop     (.out(RD1E),     .CLK(CLK), .CLR(FlushE), .in(RD1D));
+    d_flip_flop RD2ElipFlop      (.out(RD2E),     .CLK(CLK), .CLR(FlushE), .in(RD2D));
+    d_flip_flop PCEFlipFlop      (.out(PCE),      .CLK(CLK), .CLR(FlushE), .in(PCD));
+    d_flip_flop RdEFlipFlop      (.out(RdE),      .CLK(CLK), .CLR(FlushE), .in(RdD));
+    d_flip_flop Rs1EFlipFlop     (.out(Rs1E),     .CLK(CLK), .CLR(FlushE), .in(Rs1D));
+    d_flip_flop Rs2EFlipFlop     (.out(Rs2E),     .CLK(CLK), .CLR(FlushE), .in(Rs2D));
+    d_flip_flop ImmExtEFlipFlop  (.out(ImmExtE),  .CLK(CLK), .CLR(FlushE), .in(ImmExtD));
+    d_flip_flop PCPlus4EFlipFlop (.out(PCPlus4E), .CLK(CLK), .CLR(FlushE), .in(PCPlus4D));
 
     /* ---- START EXECUTE STAGE ---- */
 
-    two_to_one_mux SrcBEMux (.out(SrcBE), .selectBit(ALUSrcE), .in1(RD2E), .in2(ImmExtE));
+    three_to_one_mux SrcAEMux (.out(SrcAE), .selectBits(ForwardAE), .in1(RD1E), .in2(ResultW), .in3(ALUResultM));
+
+    three_to_one_mux writeDataEMux (.out(WriteDataE), .selectBits(ForwardBE), .in1(RD2E), .in2(ResultW), .in3(ALUResultM));
+
+    two_to_one_mux SrcBEMux (.out(SrcBE), .selectBit(ALUSrcE), .in1(WriteDataE), .in2(ImmExtE));
 
     adder PCTargetEAdder (.out(PCTargetE), .in1(PCE), .in2(ImmExtE));
 
-    alu ALU (.ALUResult(ALUResultE), .Zero(ZeroE), .ALUControl(ALUControlE), .SrcA(RD1E), .SrcB(SrcBE));
+    alu ALU (.ALUResult(ALUResultE), .Zero(ZeroE), .ALUControl(ALUControlE), .SrcA(SrcAE), .SrcB(SrcBE));
 
     /* ---- END EXECUTE STAGE ---- */
 
-    d_flip_flop ALUResultMFlipFlop (.out(ALUResultM), .CLK(CLK), .in(ALUResultE));
-    d_flip_flop writeDataMFlipFlop (.out(WriteDataM), .CLK(CLK), .in(RD2E));
-    d_flip_flop RdMFlipFlop        (.out(RdM),        .CLK(CLK), .in(RdE));
-    d_flip_flop PCPlus4MFlipFlop   (.out(PCPlus4M),   .CLK(CLK), .in(PCPlus4E));
+    d_flip_flop ALUResultMFlipFlop (.out(ALUResultM), .CLK(CLK), .CLR(1'b0), .in(ALUResultE));
+    d_flip_flop writeDataMFlipFlop (.out(WriteDataM), .CLK(CLK), .CLR(1'b0), .in(WriteDataE));
+    d_flip_flop RdMFlipFlop        (.out(RdM),        .CLK(CLK), .CLR(1'b0), .in(RdE));
+    d_flip_flop PCPlus4MFlipFlop   (.out(PCPlus4M),   .CLK(CLK), .CLR(1'b0), .in(PCPlus4E));
 
     /* ---- START MEMORY STAGE ---- */
 
@@ -111,10 +127,10 @@ module datapath (OP, funct3, funct7, ZeroE, CLK, RESET, ImmSrcD, PCSrcE, ALUSrcE
 
     /* ---- END MEMORY STAGE ---- */
 
-    d_flip_flop ALUResultWFlipFlop (.out(ALUResultW), .CLK(CLK), .in(ALUResultM));
-    d_flip_flop readDataWFlipFlop  (.out(ReadDataW),  .CLK(CLK), .in(ReadDataM));
-    d_flip_flop RdMFlipFlop        (.out(RdW),        .CLK(CLK), .in(RdM));
-    d_flip_flop PCPlus4MFlipFlop   (.out(PCPlus4W),   .CLK(CLK), .in(PCPlus4M));
+    d_flip_flop ALUResultWFlipFlop (.out(ALUResultW), .CLK(CLK), .CLR(1'b0), .in(ALUResultM));
+    d_flip_flop readDataWFlipFlop  (.out(ReadDataW),  .CLK(CLK), .CLR(1'b0), .in(ReadDataM));
+    d_flip_flop RdMFlipFlop        (.out(RdW),        .CLK(CLK), .CLR(1'b0), .in(RdM));
+    d_flip_flop PCPlus4MFlipFlop   (.out(PCPlus4W),   .CLK(CLK), .CLR(1'b0), .in(PCPlus4M));
 
     /* ---- START WRITE BACK STAGE ---- */
 
