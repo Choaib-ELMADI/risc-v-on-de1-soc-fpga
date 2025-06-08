@@ -1,8 +1,8 @@
-[![Choaib ELMADI - RISC-V](https://img.shields.io/badge/Choaib_ELMADI-RISC--V-8800dd)](https://elmadichoaib.vercel.app) ![Status - Building](https://img.shields.io/badge/Status-Building-2bd729) ![Platform - DE1-SoC](https://img.shields.io/badge/Platform-DE--1_SoC-f7d620)
+[![Choaib ELMADI - RISC-V](https://img.shields.io/badge/Choaib_ELMADI-RISC--V-8800dd)](https://elmadichoaib.vercel.app) ![Status - Building](https://img.shields.io/badge/Status-Building-2bd729) ![Platform - DE2-SoC](https://img.shields.io/badge/Platform-DE--2_SoC-f7d620)
 
-# RISC-V Processor on DE-1 SoC FPGA
+# RISC-V Processor on DE-2 SoC FPGA
 
-Welcome to the `risc-v-on-de1-soc-fpga` repository! This project implements a simplified RISC-V processor architecture using Verilog and is deployed on the DE-1 SoC FPGA development board.
+Welcome to the `risc-v-on-de2-soc-fpga` repository! This project implements a simplified RISC-V processor architecture using Verilog and is deployed on the DE-2 SoC FPGA development board.
 
 ## Repository Structure
 
@@ -48,7 +48,7 @@ The `cpu.v` module is the top-level design and contains the instantiations of `d
 
 - **Quartus Prime** – For writing, compiling, and deploying Verilog code.
 - **ModelSim** – For simulation and debugging.
-- **DE-1 SoC FPGA Board** – As the hardware target platform.
+- **DE-2 SoC FPGA Board** – As the hardware target platform.
 
 ## Goal of the Project
 
@@ -57,3 +57,5 @@ The main objective is to understand and implement the internal working of a RISC
 ## Related Work
 
 If you're new to Verilog or want to brush up on the basics, check out this repo: [Getting Started with Verilog](https://github.com/Choaib-ELMADI/getting-started-with-verilog)
+
+If you're looking for a deeper dive into processor architecture, including detailed experiments and more advanced implementations, check out: [RISC-V Deep Dive on FPGA](https://github.com/Choaib-ELMADI/risc-v-deep-dive-on-fpga)
