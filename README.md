@@ -58,4 +58,4 @@ The main objective is to understand and implement the internal working of a RISC
 
 If you're new to Verilog or want to brush up on the basics, check out this repo: [Getting Started with Verilog](https://github.com/Choaib-ELMADI/getting-started-with-verilog)
 
-If you're looking for a deeper dive into processor architecture, including detailed experiments and more advanced implementations, check out: [RISC-V Deep Dive on FPGA](https://github.com/Choaib-ELMADI/risc-v-deep-dive-on-fpga)
+If you're looking for a deeper dive into processor architecture, including detailed experiments and more advanced implementations, check out: [RISC-V Deep Dive on FPGA](https://github.com/Choaib-ELMADI/riscv-classic-to-optimized-to-pipelined)
